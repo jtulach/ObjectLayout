@@ -33,8 +33,6 @@ abstract class AbstractIntrinsicObjectModel<T>  {
         this.primitiveArrayModel = primitiveArrayModel;
         this.structuredArrayModel = structuredArrayModel;
 
-        field.setAccessible(true);
-
         sanityCheckAtModelConstruction();
     }
 
@@ -80,7 +78,6 @@ abstract class AbstractIntrinsicObjectModel<T>  {
             try {
                 if (Modifier.isStatic(field.getModifiers()) &&
                         AbstractIntrinsicObjectModel.class.isAssignableFrom(field.getType())) {
-                    field.setAccessible(true);
                     AbstractIntrinsicObjectModel model = (AbstractIntrinsicObjectModel) field.get(null /* static field */);
                     if ((model != null ) &&
                             (model.field.equals(field))) {
@@ -135,14 +132,14 @@ abstract class AbstractIntrinsicObjectModel<T>  {
     }
 
     final void _sanityCheckInstantiation(final Object containingObject) {
-        try {
-            if (field.get(containingObject) != null) {
-                throw new IllegalStateException("Intrinsic object field \"" + field.getName() +
-                        "\" in containing object is already initialized");
-            }
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException(e);
-        }
+//        try {
+//            if (field.get(containingObject) != null) {
+//                throw new IllegalStateException("Intrinsic object field \"" + field.getName() +
+//                        "\" in containing object is already initialized");
+//            }
+//        } catch (IllegalAccessException e) {
+//            throw new IllegalStateException(e);
+//        }
     }
 
     final boolean _isPrimitiveArray() {
@@ -163,19 +160,19 @@ abstract class AbstractIntrinsicObjectModel<T>  {
 
     void directlyInitializeTargetField(final Object containingObject,
                                        T intrinsicObject) {
-        try {
-            if (field.get(containingObject) != null) {
-                throw new IllegalStateException(
-                        "Bad value for field \"" +
-                                field.getName() +
-                                "\". Intrinsic object field was initialized without being " +
-                                "constructed by IntrinsicObjectModel.constructWithin(). " +
-                                "Cannot make any of the intrinsic objects fields accessible."
-                );
-            }
+//        try {
+//            if (field.get(containingObject) != null) {
+//                throw new IllegalStateException(
+//                        "Bad value for field \"" +
+//                                field.getName() +
+//                                "\". Intrinsic object field was initialized without being " +
+//                                "constructed by IntrinsicObjectModel.constructWithin(). " +
+//                                "Cannot make any of the intrinsic objects fields accessible."
+//                );
+//            }
             // Why initialize directly?
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException(e);
-        }
+//        } catch (IllegalAccessException e) {
+//            throw new IllegalStateException(e);
+//        }
     }
 }

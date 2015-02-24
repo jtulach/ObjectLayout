@@ -461,9 +461,6 @@ public class StructuredArray<T> extends AbstractStructuredArray<T> implements It
         this.arrayModel = arrayBuilder.getArrayModel();
 
         final Field[] fields = removeStaticFields(Field.declaredFields(getElementClass()));
-        for (final Field field : fields) {
-            field.setAccessible(true);
-        }
         this.fields = fields;
         this.hasFinalFields = containsFinalQualifiedFields(fields);
 

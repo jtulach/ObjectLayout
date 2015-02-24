@@ -24,19 +24,17 @@ final class Field {
     }
     
     Object get(Object thiz) throws IllegalAccessException {
+        delegate.setAccessible(true);
         return delegate.get(thiz);
     }
     
     void set(Object thiz, Object v) throws IllegalAccessException {
+        delegate.setAccessible(true);
         delegate.set(thiz, v);
     }
 
     int getModifiers() {
         return delegate.getModifiers();
-    }
-
-    void setAccessible(boolean b) {
-        delegate.setAccessible(b);
     }
 
     String getName() {
