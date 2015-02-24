@@ -169,7 +169,7 @@ public final class IntrinsicObjects {
             HashMap<String, IntrinsicObjectModel> modelsByFieldName) {
         Class c = containingObject.getClass();
         for (Field field : Field.declaredFields(c)) {
-            if (field.getAnnotation(Intrinsic.class) != null) {
+            if (field.isIntrinsic()) {
                 IntrinsicObjectModel<T> objectModel = createModel(field);
                 modelsByFieldName.put(field.getName(), objectModel);
             }
@@ -197,8 +197,7 @@ public final class IntrinsicObjects {
         Class containingClass = field.getDeclaringClass();
 
         // Verify that the field has an @Intrinsic annotation:
-        Intrinsic intrinsicAnnotation = field.getAnnotation(Intrinsic.class);
-        if (intrinsicAnnotation == null) {
+        if (!field.isIntrinsic()) {
             throw new IllegalArgumentException("Field \"" + field.getName() + "\" in class " +
                     containingClass.getSimpleName() + " does not have an @Intrinsic annotation");
         }
@@ -208,11 +207,11 @@ public final class IntrinsicObjects {
             throw new IllegalArgumentException("@Intrinsic annotations cannot be applied to primitive types");
         }
 
-        PrimitiveArrayModel primitiveArrayModel = getPrimitiveArrayModel(field, intrinsicAnnotation);
+        PrimitiveArrayModel primitiveArrayModel = getPrimitiveArrayModel(field);
 
-        StructuredArrayModel structuredArrayModel = getStructuredArrayModel(field, intrinsicAnnotation);
+        StructuredArrayModel structuredArrayModel = getStructuredArrayModel(field);
 
-        sanityCheckAnnotation(intrinsicAnnotation, objectClass);
+        sanityCheckAnnotation(field, objectClass);
 
         IntrinsicObjectModel<T> objectModel =
                 new IntrinsicObjectModel<T>(
@@ -223,8 +222,8 @@ public final class IntrinsicObjects {
         return objectModel;
     }
 
-    private static long getLengthFromAnnotation(Intrinsic intrinsicAnnotation, Class objectClass) {
-        long length = intrinsicAnnotation.length();
+    private static long getLengthFromAnnotation(Field field, Class objectClass) {
+        long length = field.length();
         if (length == Intrinsic.NO_LENGTH) {
             throw new IllegalArgumentException("length not specified. @Intrinsic annotations of " +
                     objectClass.getSimpleName() + " must specify length (via length = ...)");
@@ -236,18 +235,18 @@ public final class IntrinsicObjects {
     }
 
     private static <T extends AbstractPrimitiveArray> PrimitiveArrayModel<T> getPrimitiveArrayModel(
-            Field field, Intrinsic intrinsicAnnotation) {
+            Field field) {
         if (!(AbstractPrimitiveArray.class.isAssignableFrom(field.getType()))) {
             return null;
         }
         @SuppressWarnings("unchecked")
         Class<T> objectClass = (Class<T>) field.getType();
-        long length = getLengthFromAnnotation(intrinsicAnnotation, objectClass);
+        long length = getLengthFromAnnotation(field, objectClass);
         return new PrimitiveArrayModel<T>(objectClass, length);
     }
 
     private static <T, S extends StructuredArray<T>> StructuredArrayModel<S, T>
-    getStructuredArrayModel(Field field, Intrinsic intrinsicAnnotation) {
+    getStructuredArrayModel(Field field) {
         if (!StructuredArray.class.isAssignableFrom(field.getType())) {
             return null;
         }
@@ -255,18 +254,18 @@ public final class IntrinsicObjects {
         @SuppressWarnings("unchecked")
         Class<S> objectClass = (Class<S>) field.getType();
 
-        long length = getLengthFromAnnotation(intrinsicAnnotation, objectClass);
+        long length = getLengthFromAnnotation(field, objectClass);
 
         @SuppressWarnings("unchecked")
-        Class<T> elementClass = deriveElementClass(field, intrinsicAnnotation);
+        Class<T> elementClass = deriveElementClass(field);
 
         return new StructuredArrayModel<S, T>(objectClass, elementClass, length){};
     }
 
-    private static <T> Class<T> deriveElementClass(Field field, Intrinsic intrinsicAnnotation) {
+    private static <T> Class<T> deriveElementClass(Field field) {
 
         @SuppressWarnings("unchecked")
-        Class<T> elementClass = intrinsicAnnotation.elementClass();
+        Class<T> elementClass = (Class<T>)field.elementClass();
         Class objectClass = field.getType();
 
         if (!Object.class.isAssignableFrom(elementClass)) {
@@ -319,20 +318,20 @@ public final class IntrinsicObjects {
 
     }
 
-    private static <T> void sanityCheckAnnotation(Intrinsic intrinsicAnnotation, Class<T> objectClass) {
+    private static <T> void sanityCheckAnnotation(Field field, Class<T> objectClass) {
 
         boolean isPrimitiveArray = AbstractPrimitiveArray.class.isAssignableFrom(objectClass);
         boolean isStructuredArray = StructuredArray.class.isAssignableFrom(objectClass);
 
         if (!isPrimitiveArray && !isStructuredArray) {
-            if (intrinsicAnnotation.length() != Intrinsic.NO_LENGTH) {
+            if (field.length() != Intrinsic.NO_LENGTH) {
                 throw new IllegalArgumentException(
                         "@Intrinsic annotations can only specify length for array types");
             }
         }
 
         if (!isStructuredArray) {
-            if (intrinsicAnnotation.elementClass() != Intrinsic.NO_DECLARED_CLASS.class) {
+            if (field.elementClass() != Intrinsic.NO_DECLARED_CLASS.class) {
                 throw new IllegalArgumentException(
                         "@Intrinsic annotations can only specify elementClass for StructuredArray types");
             }

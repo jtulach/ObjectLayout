@@ -52,8 +52,21 @@ final class Field {
     Class<?> getDeclaringClass() {
         return delegate.getDeclaringClass();
     }
-
-    <T extends Annotation> T getAnnotation(Class<T> anno) {
-        return delegate.getAnnotation(anno);
+    
+    boolean isIntrinsic() {
+        return getAnnotation() != null;
     }
+
+    long length() {
+        return getAnnotation().length();
+    }
+
+    Class<?> elementClass() {
+        return getAnnotation().elementClass();
+    }
+    
+    private Intrinsic getAnnotation() {
+        return delegate.getAnnotation(Intrinsic.class);
+    }
+
 }
