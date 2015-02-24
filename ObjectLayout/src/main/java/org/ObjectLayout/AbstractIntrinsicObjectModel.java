@@ -1,11 +1,8 @@
 package org.ObjectLayout;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.util.Collection;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This class contains the intrinsifiable portions of IntrinsicObjectModel behavior. JDK implementations
@@ -79,7 +76,7 @@ abstract class AbstractIntrinsicObjectModel<T>  {
                             "specified objectClass \"" + objectClass.getName() + "\"");
         }
         // Verify that no other model for this field already exists:
-        for (Field field : containingClass.getDeclaredFields()) {
+        for (Field field : Field.declaredFields(containingClass)) {
             try {
                 if (Modifier.isStatic(field.getModifiers()) &&
                         AbstractIntrinsicObjectModel.class.isAssignableFrom(field.getType())) {

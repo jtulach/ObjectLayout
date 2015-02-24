@@ -7,7 +7,6 @@ package org.ObjectLayout;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Iterator;
@@ -461,7 +460,7 @@ public class StructuredArray<T> extends AbstractStructuredArray<T> implements It
         context.setArray(this);
         this.arrayModel = arrayBuilder.getArrayModel();
 
-        final Field[] fields = removeStaticFields(getElementClass().getDeclaredFields());
+        final Field[] fields = removeStaticFields(Field.declaredFields(getElementClass()));
         for (final Field field : fields) {
             field.setAccessible(true);
         }

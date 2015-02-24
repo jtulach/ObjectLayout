@@ -6,7 +6,6 @@
 package org.ObjectLayout;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -169,7 +168,7 @@ public final class IntrinsicObjects {
             Object containingObject,
             HashMap<String, IntrinsicObjectModel> modelsByFieldName) {
         Class c = containingObject.getClass();
-        for (Field field : c.getDeclaredFields()) {
+        for (Field field : Field.declaredFields(c)) {
             if (field.getAnnotation(Intrinsic.class) != null) {
                 IntrinsicObjectModel<T> objectModel = createModel(field);
                 modelsByFieldName.put(field.getName(), objectModel);
