@@ -11,10 +11,20 @@ import java.lang.reflect.Constructor;
 
 import static java.lang.Long.valueOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import org.junit.AfterClass;
+import static org.junit.Assert.*;
+import org.junit.BeforeClass;
 
 public class IntrinsticObjectTest {
+    @BeforeClass public static void restrictPermissions() {
+        RestrictedSecurityManager.enable();
+    }
 
+    
+    @AfterClass public static void cleanUpRestrictions() {
+        RestrictedSecurityManager.disable();
+    }
+    
     @Test
     public void shouldConstructLine() throws NoSuchMethodException {
         Line line = new Line();
@@ -388,4 +398,5 @@ public class IntrinsticObjectTest {
         }
     }
 
+    
 }
