@@ -176,7 +176,7 @@ abstract class AbstractIntrinsicObjectModel<T>  {
                                 "Cannot make any of the intrinsic objects fields accessible."
                 );
             }
-            field.set(containingObject, intrinsicObject);
+            // Why initialize directly?
         } catch (IllegalAccessException e) {
             throw new IllegalStateException(e);
         }
